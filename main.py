@@ -30,7 +30,7 @@ async def start(mess: types.Message):
                            'Хочешь крутой музон? тогда ответь на парочку моих вопросов')
     sleep(0.5)
     await dj.send_message(text='1. Как настроение? Весело, грустно, или может ты словил дзен?\n'
-                               '2. Чо делвешь?\n',
+                               '2. Чо делаешь?\n',
                           chat_id=mess.from_user.id)
 
 
