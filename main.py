@@ -1,12 +1,15 @@
 import logging
+import os
 from aiogram.dispatcher.filters import Text
 import validator
 from time import sleep
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+from aiogram.types import CallbackQuery
 from keyboards import keyboard, genres
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from obrabotka_db import recomend
 
 with open('token') as token:
     TOKEN = token.read()
@@ -17,23 +20,17 @@ logging.basicConfig(
 
 dj = Bot(TOKEN)
 
-dispatcer = Dispatcher(dj)
-
-keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-keyboard.add(KeyboardButton('start'))
-
-genres = InlineKeyboardMarkup(row_width=2)
-n = 0
-for btn in ["Джаз", "Классическая Музыка", "Поп-музыка", "Рок/металл", "Хип-хоп", "Шансон"]:
-    n += 1
-    button = InlineKeyboardButton(text=btn,
-                                  callback_data=f"genre_{n}")
-    genres.add(button)
+dispatcer = Dispatcher(dj, storage=MemoryStorage())
 
 
 class Ans(StatesGroup):
     mood = State()
     occupation = State()
+    genre = State()
+
+
+li = []
+
 
 
 @dispatcer.message_handler(commands=['start'])
@@ -43,10 +40,10 @@ async def start(mess: types.Message):
     sleep(1)
     await mess.answer(text='Приветсвую!\n'
                            'Хочешь крутой музон? тогда ответь на парочку моих вопросов')
+
+    # os.system(r'nul>static/ans.txt')
     sleep(0.5)
-    # await dj.send_message(text='1. Как настроение? Весело, грустно, или может ты словил дзен?\n'
-    #                            '2. Чо делаешь?\n',
-    #                       chat_id=mess.from_user.id)
+    li.clear()
 
 
 @dispatcer.message_handler(state=None)
@@ -57,46 +54,72 @@ async def askMood(mess: types.Message):
 
 @dispatcer.message_handler(state=Ans.mood)
 async def getMood(mess: types.Message, state: FSMContext):
-    mood = validator.validateMood(mess)
+    mood = validator.validateMood(mess.text)
     await state.update_data(
         {'Настроение:': mood}
     )
+    print(mood)
+
+    li.append(mood)
+    await mess.answer(text='Второй вопрос: чо делвешь?')
 
     await Ans.next()
 
 
-@dispatcer.message_handler()
-async def askOccupation(mess: types.Message):
-    await mess.answer(text='Второй вопрос: чо делвешь?')
+# @dispatcer.message_handler(state=Ans.occupation)
+# async def askOccupation(mess: types.Message):
+#     await mess.answer(text='Второй вопрос: чо делвешь?')
 
 
 @dispatcer.message_handler(state=Ans.occupation)
-async def getOccupation(mess: types.Message, state=)
-
-
-@dispatcer.message_handler()
-async def askGenre(mess: types.Message):
+async def getOccupation(mess: types.Message, state=FSMContext):
+    # answers = await state.get_data()
+    # mood = answers.get("mood")
+    occupation = validator.validateOccupation(mess.text)
+    await state.update_data(
+        {'Занятие:': occupation}
+    )
+    print(occupation)
+    li.append(occupation)
+    print(li)
     await mess.answer(text='И последний, какой жанр предпочетаешь?',
                       reply_markup=genres)
+    await Ans.next()
 
 
-@dispatcer.callback_query_handler(Text(startswith="genre_"))
+# @dispatcer.message_handler(state=Ans.genre)
+# async def askGenre(mess: types.Message):
+#     await mess.answer(text='И последний, какой жанр предпочетаешь?',
+#                       reply_markup=genres)
+
+
+@dispatcer.callback_query_handler(Text(startswith="genre_"), state=Ans.genre)
 async def callbackGenre(call: CallbackQuery):
     await call.answer('Хорошо')
     action = call.data.split("_")[1]
+
     match action:
         case "1":
             print("Джаз")
+            li.append('Джаз')
         case "2":
             print("Классическая Музыка")
+            li.append('Классическая Музыка')
         case "3":
             print("Поп-музыка")
+            li.append('Поп-музыка')
         case "4":
             print("Рок-металл")
+            li.append('Рок-металл')
         case "5":
             print("Хип-хоп")
+            li.append('Хип-хоп')
         case "6":
             print("Шансон")
+            li.append('Шансон')
+
+    await dj.send_message(text=recomend(li), chat_id=call.from_user.id)
+
 
 
 # @dispatcer.message_handler()
