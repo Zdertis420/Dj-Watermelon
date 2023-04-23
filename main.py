@@ -1,8 +1,8 @@
 import logging
-from telegram.ext import Application, MessageHandler, filters, CommandHandler, CallbackQueryHandler
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton
-from time import sleep
 import validator
+from time import sleep
+from aiogram import Bot, Dispatcher, executor, types
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
 with open('token') as token:
     TOKEN = token.read()
@@ -11,72 +11,35 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
 )
 
-logger = logging.getLogger(__name__)
+dj = Bot(TOKEN)
 
-replyKeyboard = [['/start']]
-markup = ReplyKeyboardMarkup(replyKeyboard, one_time_keyboard=True, resize_keyboard=True)
+dispatcer = Dispatcher(dj)
 
-keyboard = [[InlineKeyboardButton("Да", callback_data="Да")]]
-
-replyMarkup = InlineKeyboardMarkup(keyboard)
+keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+keyboard.add(KeyboardButton('start'))
 
 
-async def start(update, context):
-    await update.message.reply_video(video='static/img/DJ_Арбуз.mp4',
-                                     reply_markup=markup)
+
+
+@dispatcer.message_handler(commands=['start'])
+async def start(mess: types.Message):
+    await dj.send_video(mess.chat.id, open('static/img/DJ_Арбуз.mp4', 'rb'),
+                        reply_markup=keyboard)
     sleep(1)
-    await hello(update)
+    await mess.answer(text='Приветсвую!\n'
+                           'Хочешь крутой музон? тогда ответь на парочку моих вопросов')
+    sleep(0.5)
+    await dj.send_message(text='1. Как настроение? Весело, грустно, или может ты словил дзен?\n'
+                               '2. Чо делвешь?\n',
+                          chat_id=mess.from_user.id)
 
 
-async def hello(update):
-    await update.message.reply_text(text='Приветсвую!\n'
-                                         'Какую музыку желаешь послушать? Ответишь на парочку моих вопросов?',
-                                    reply_markup=replyMarkup)
-
-
-async def askMood(update):
-    await update.message.reply_text(text='Как настроение?')
-    mood = update.message.text()
-    return validator.validateMood(mood)
-
-
-async def askOccupation(update):
-    await update.message.reply_text('Чо делаешь?')
-    occupation = update.message.text()
-    return validator.validateOccupation(occupation)
-
-
-async def callbackInline(update, callback: CallbackQueryHandler):
-    if callback:
-        mood = await askMood(update)
-        occupation = await askOccupation(update)
-        # genre = askUser.askGenre(update)
-
-
-async def closeKeyboard(update, context):
-    await update.message.reply_text(
-        "Ok",
-        reply_markup=ReplyKeyboardRemove()
-    )
-
-
-async def echo(update, context):
-    await update.message.reply_text(update.message.text)
-
-
-async def reply(update, context):
-    await update.message.reply_text('Отлично! Les go~')
-
-
-def main():
-    application = Application.builder().token(TOKEN).build()
-    text_handler = MessageHandler(filters.TEXT, echo)
-    application.add_handler(CommandHandler('start', start))
-    application.add_handler(CommandHandler("close", closeKeyboard))
-    application.add_handler(CallbackQueryHandler(callbackInline))
-    application.add_handler(text_handler)
-    application.run_polling()
+@dispatcer.message_handler()
+async def getMoodOrOccupation(mess: types.Message):
+    mood = validator.validateMood(mess)
+    occupation = validator.validateOccupation(mess)
+    return (mood, occupation)
 
 
 if __name__ == '__main__':
-    main()
+    executor.start_polling(dispatcer)

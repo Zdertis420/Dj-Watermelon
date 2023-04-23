@@ -3,7 +3,7 @@ O = ["тренировки", "отдыха", "дороги", "работы"]
 
 
 def validateMood(mood):
-    words = [_.lower() for _ in mood.split()]
+    words = [_.lower() for _ in mood.text.split()]
     for word in words:
         if 'весёл' in word or 'весел' in word or 'энер' in word:
             return M[0]
@@ -11,11 +11,11 @@ def validateMood(mood):
             return M[1]
         if 'грус' in word or 'грущ' in word or 'депрес' in word:
             return M[2]
-        return 'Я такого не знаю'
+        return None
 
 
 def validateOccupation(occupation):
-    words = [_.lower() for _ in occupation.split()]
+    words = [_.lower() for _ in occupation.text.split()]
     for word in words:
         if 'трен' in word:
             return O[0]
@@ -25,4 +25,9 @@ def validateOccupation(occupation):
             return O[2]
         if 'работ' in word:
             return O[3]
-        return 'Такого не знаю'
+        return None
+
+
+
+
+
