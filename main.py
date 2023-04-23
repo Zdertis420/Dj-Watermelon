@@ -37,7 +37,7 @@ li = []
 async def start(mess: types.Message):
     await dj.send_video(mess.chat.id, open('static/img/DJ_Арбуз.mp4', 'rb'),
                         reply_markup=keyboard)
-    sleep(1)
+    sleep(0.5)
     await mess.answer(text='Приветсвую!\n'
                            'Хочешь крутой музон? тогда ответь на парочку моих вопросов')
 
@@ -48,7 +48,7 @@ async def start(mess: types.Message):
 
 @dispatcer.message_handler(state=None)
 async def askMood(mess: types.Message):
-    await mess.answer(text='Итак, вопрос номер 1: как настроение? Весело, грустно, или может ты словил дзен?')
+    await mess.answer(text='Итак, вопрос номер один: как настроение? Веселое, грустное, или может ты словил дзен?')
     await Ans.mood.set()
 
 
@@ -61,7 +61,7 @@ async def getMood(mess: types.Message, state: FSMContext):
     print(mood)
 
     li.append(mood)
-    await mess.answer(text='Второй вопрос: чо делвешь?')
+    await mess.answer(text='Второй вопрос: что делаешь?')
 
     await Ans.next()
 
@@ -82,7 +82,7 @@ async def getOccupation(mess: types.Message, state=FSMContext):
     print(occupation)
     li.append(occupation)
     print(li)
-    await mess.answer(text='И последний, какой жанр предпочетаешь?',
+    await mess.answer(text='И последний, какой жанр предпочитаешь?',
                       reply_markup=genres)
     await Ans.next()
 
@@ -117,6 +117,8 @@ async def callbackGenre(call: CallbackQuery):
         case "6":
             print("Шансон")
             li.append('Шансон')
+
+    print(li)
 
     await dj.send_message(text=recomend(li), chat_id=call.from_user.id)
 
