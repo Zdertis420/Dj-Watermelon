@@ -2,15 +2,14 @@ import sqlite3
 import random
 
 
-
-def recomend(li):
+def recomend(li, Uid):
     M = ["Весёлое", "Спокойное", "Грустное"]
     O = ["Тренируюсь", "Отдыхаю", "В дороге", "Работаю-Учусь"]
     G = ["Джаз", "Классическая Музыка", "Поп-музыка", "Рок-металл", "Хип-хоп", "Шансон"]
 
-    m = li[0]
-    o = li[1]
-    g = li[2]
+    m = li[Uid][0]
+    o = li[Uid][1]
+    g = li[Uid][2]
 
     DB = "music/Dj-Арбуз музыка.db"
     connection = sqlite3.connect(DB)
@@ -25,10 +24,12 @@ def recomend(li):
     for i in range(len(songs)):
         songs[i] = songs[i][0]
 
-    answer = "Тогда тебе стоит послушать это:\n"
+    answer = "Тогда тебе стоит послушать это:\n\n"
+    n = 0
     for i in songs:
+        n += 1
         if i != songs[-1]:
-            answer += i + "\n"
+            answer += str(n) + ". " + i + "\n"
         else:
             answer += i
 
