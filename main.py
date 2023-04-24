@@ -29,7 +29,7 @@ class Ans(StatesGroup):
     genre = State()
 
 
-li = []
+li = dict()
 
 
 
@@ -44,6 +44,7 @@ async def start(mess: types.Message):
     # os.system(r'nul>static/ans.txt')
     sleep(0.5)
     li.clear()
+    li[mess.from_user.id] = []
 
 
 @dispatcer.message_handler(state=None)
@@ -60,7 +61,7 @@ async def getMood(mess: types.Message, state: FSMContext):
     )
     print(mood)
 
-    li.append(mood)
+    li[mess.from_user.id].append(mood)
     await mess.answer(text='Второй вопрос: что делаешь?')
 
     await Ans.next()
@@ -80,7 +81,7 @@ async def getOccupation(mess: types.Message, state=FSMContext):
         {'Занятие:': occupation}
     )
     print(occupation)
-    li.append(occupation)
+    li[mess.from_user.id].append(occupation)
     print(li)
     await mess.answer(text='И последний, какой жанр предпочитаешь?',
                       reply_markup=genres)
@@ -101,26 +102,26 @@ async def callbackGenre(call: CallbackQuery):
     match action:
         case "1":
             print("Джаз")
-            li.append('Джаз')
+            li[call.from_user.id].append("Джаз")
         case "2":
             print("Классическая Музыка")
-            li.append('Классическая Музыка')
+            li[call.from_user.id].append("Классическая Музыка")
         case "3":
             print("Поп-музыка")
-            li.append('Поп-музыка')
+            li[call.from_user.id].append("Поп-музыка")
         case "4":
             print("Рок-металл")
-            li.append('Рок-металл')
+            li[call.from_user.id].append("Рок-металл")
         case "5":
             print("Хип-хоп")
-            li.append('Хип-хоп')
+            li[call.from_user.id].append("Хип-хоп")
         case "6":
             print("Шансон")
-            li.append('Шансон')
+            li[call.from_user.id].append("Шансон")
 
     print(li)
 
-    await dj.send_message(text=recomend(li), chat_id=call.from_user.id)
+    await dj.send_message(text=recomend(li, call.from_user.id), chat_id=call.from_user.id)
 
 
 
