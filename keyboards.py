@@ -1,8 +1,11 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
 
-keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-keyboard.add(KeyboardButton('start'))
+start = ReplyKeyboardMarkup(resize_keyboard=True)
+start.add(KeyboardButton('start'))
+
+
+
 
 genres = InlineKeyboardMarkup(row_width=2)
 n = 0
