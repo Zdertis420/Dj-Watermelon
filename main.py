@@ -3,7 +3,7 @@ from aiogram.dispatcher.filters import Text
 from time import sleep
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import CallbackQuery
-from keyboards import keyboard, genres
+from keyboards import start, genres
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -34,12 +34,13 @@ li = dict()
 @dispatcer.message_handler(commands=['start'])
 async def start(mess: types.Message):
     await dj.send_video(mess.chat.id, open('static/img/DJ_Арбуз.mp4', 'rb'),
-                        reply_markup=keyboard)
+                        reply_markup=start)
     sleep(0.5)
     await mess.answer(text='Приветсвую!\n'
                            'Хочешь крутой музон? тогда ответь на парочку моих вопросов')
 
     sleep(0.5)
+    li.clear()
     li[mess.from_user.id] = []
 
 
