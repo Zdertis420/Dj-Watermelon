@@ -22,7 +22,7 @@ def validateOccupation(occupation):
         if 'трен' in word or 'бег' in word or 'кача' in word or 'спорт' in word:
             return O[0]
         if 'отдых' in word or 'чил' in word or 'сижу' in word or 'лежу' in word or 'ем' in word or 'хав' in word or\
-                'куша' in word or 'игр':
+                'куша' in word or 'игр' or 'ср' in word:
             return O[1]
         if 'дорог' in word or 'пут' in word or 'еду' in word or 'едем' in word or 'двиг' in word or 'движ' in word:
             return O[2]
