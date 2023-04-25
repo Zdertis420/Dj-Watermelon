@@ -11,16 +11,19 @@ def recomend(li, Uid):
     o = li[Uid][1]
     g = li[Uid][2]
 
-    DB = "music/Dj-Арбуз музыка.db"
+    DB = "watermelow.db"
     connection = sqlite3.connect(DB)
     cur = connection.cursor()
 
     table = cur.execute(f"""SELECT id FROM main WHERE mood='{m}' AND occupation='{o}' AND genre='{g}'""").fetchall()
-    table = "t" + str(table[0][0])
+    if table[0][0] < 10:
+        table = "t" + "0" + str(table[0][0])
+    else:
+        table = "t" + str(table[0][0])
     result = cur.execute(f"""SELECT song FROM {table}""").fetchall()
     random.shuffle(result)
     n = 3
-    songs = result[n-3:n]
+    songs = result[:n]
     for i in range(len(songs)):
         songs[i] = songs[i][0]
 
@@ -46,6 +49,6 @@ def recomend(li, Uid):
     #     answer = ""
     #     for i in songs:
     #         if i != songs[-1]:
-    #             answer += i + "\n"
+    #             answer += str(n) + ". " + i + "\n"
     #         else:
-    #             answer += i
+    #             answer += str(n) + ". " + i
