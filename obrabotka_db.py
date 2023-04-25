@@ -31,7 +31,7 @@ def recomend(li, Uid):
         if i != songs[-1]:
             answer += str(n) + ". " + i + "\n"
         else:
-            answer += i
+            answer += str(n) + ". " + i
 
     return answer
 
