@@ -39,7 +39,7 @@ async def More(mess: types.Message):
 @dispatcer.message_handler(commands=['again'])
 async def Again(mess: types.Message, state: FSMContext):
     state.reset()
-    await askMood()
+    await askMood(mess)
 
 @dispatcer.message_handler(commands=['start'])
 async def start(mess: types.Message):
@@ -51,12 +51,14 @@ async def start(mess: types.Message):
 
     # os.system(r'nul>static/ans.txt')
     sleep(0.5)
-    li.clear()
-    li[str(mess.from_user.id)] = []
+
+    await askMood(mess)
 
 
-@dispatcer.message_handler(state=None)
+@dispatcer.message_handler()
 async def askMood(mess: types.Message):
+    li[str(mess.from_user.id)] = []
+    sleep(0.5)
     await mess.answer(text='Итак, вопрос номер один: как настроение? Веселое, грустное, или может ты словил дзен?')
     await Ans.mood.set()
 
@@ -103,7 +105,7 @@ async def getOccupation(mess: types.Message, state=FSMContext):
 
 
 @dispatcer.callback_query_handler(Text(startswith="genre_"), state=Ans.genre)
-async def callbackGenre(call: CallbackQuery):
+async def callbackGenre(call: CallbackQuery, state=FSMContext):
     await call.answer('Хорошо')
     action = call.data.split("_")[1]
 
@@ -130,6 +132,7 @@ async def callbackGenre(call: CallbackQuery):
     print(li)
 
     await dj.send_message(text=recomend(li, str(call.from_user.id)), chat_id=call.from_user.id)
+    await state.finish()
     keyboard.add(KeyboardButton('more'))
 
 
