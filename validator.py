@@ -13,7 +13,13 @@ def validateMood(mood):
         if 'грус' in word or 'грущ' in word or 'депрес' in word or 'плох' in word or 'ужас' in word or\
                 'так' in word or 'хуже' in word or 'худш' in word:
             return M[2]
-    return 'Жопа!'
+    if len(words) <= 3:
+        return M[0]
+    elif len(words) <= 7:
+        return M[1]
+    else:
+        return M[2]
+
 
 
 def validateOccupation(occupation):
@@ -22,23 +28,11 @@ def validateOccupation(occupation):
         if 'трен' in word or 'бег' in word or 'кача' in word or 'спорт' in word:
             return O[0]
         if 'отдых' in word or 'чил' in word or 'сижу' in word or 'лежу' in word or 'ем' in word or 'хав' in word or\
-                'куша' in word or 'игр' or 'ср' in word:
+                'куша' in word or 'игр' in word or 'чит' in word:
             return O[1]
         if 'дорог' in word or 'пут' in word or 'еду' in word or 'едем' in word or 'двиг' in word or 'движ' in word:
             return O[2]
         if 'работ' in word or 'учу' in word or 'заним' in word or 'дел' in word or 'защи' in word or 'тест' in word or\
                 'пиш' in word or 'программир' in word or 'програмир' in word:
             return O[3]
-    return 'Жопа!'
-
-
-
-
-
-
-
-
-
-
-
-
+    return O[1]
