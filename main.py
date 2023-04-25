@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters import Text
 import validator
 from time import sleep
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, KeyboardButton
 from keyboards import keyboard, genres
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
@@ -32,6 +32,14 @@ class Ans(StatesGroup):
 li = dict()
 
 
+@dispatcer.message_handler(commands=['more'])
+async def More(mess: types.Message):
+    await dj.send_message(text=recomend(li, str(mess.from_user.id)), chat_id=mess.from_user.id)
+
+@dispatcer.message_handler(commands=['again'])
+async def Again(mess: types.Message, state: FSMContext):
+    state.reset()
+    await askMood()
 
 @dispatcer.message_handler(commands=['start'])
 async def start(mess: types.Message):
@@ -44,7 +52,7 @@ async def start(mess: types.Message):
     # os.system(r'nul>static/ans.txt')
     sleep(0.5)
     li.clear()
-    li[mess.from_user.id] = []
+    li[str(mess.from_user.id)] = []
 
 
 @dispatcer.message_handler(state=None)
@@ -61,7 +69,7 @@ async def getMood(mess: types.Message, state: FSMContext):
     )
     print(mood)
 
-    li[mess.from_user.id].append(mood)
+    li[str(mess.from_user.id)].append(mood)
     await mess.answer(text='Второй вопрос: что делаешь?')
 
     await Ans.next()
@@ -81,7 +89,7 @@ async def getOccupation(mess: types.Message, state=FSMContext):
         {'Занятие:': occupation}
     )
     print(occupation)
-    li[mess.from_user.id].append(occupation)
+    li[str(mess.from_user.id)].append(occupation)
     print(li)
     await mess.answer(text='И последний, какой жанр предпочитаешь?',
                       reply_markup=genres)
@@ -102,26 +110,27 @@ async def callbackGenre(call: CallbackQuery):
     match action:
         case "1":
             print("Джаз")
-            li[call.from_user.id].append("Джаз")
+            li[str(call.from_user.id)].append("Джаз")
         case "2":
             print("Классическая Музыка")
-            li[call.from_user.id].append("Классическая Музыка")
+            li[str(call.from_user.id)].append("Классическая Музыка")
         case "3":
             print("Поп-музыка")
-            li[call.from_user.id].append("Поп-музыка")
+            li[str(call.from_user.id)].append("Поп-музыка")
         case "4":
             print("Рок-металл")
-            li[call.from_user.id].append("Рок-металл")
+            li[str(call.from_user.id)].append("Рок-металл")
         case "5":
             print("Хип-хоп")
-            li[call.from_user.id].append("Хип-хоп")
+            li[str(call.from_user.id)].append("Хип-хоп")
         case "6":
             print("Шансон")
-            li[call.from_user.id].append("Шансон")
+            li[str(call.from_user.id)].append("Шансон")
 
     print(li)
 
-    await dj.send_message(text=recomend(li, call.from_user.id), chat_id=call.from_user.id)
+    await dj.send_message(text=recomend(li, str(call.from_user.id)), chat_id=call.from_user.id)
+    keyboard.add(KeyboardButton('more'))
 
 
 
