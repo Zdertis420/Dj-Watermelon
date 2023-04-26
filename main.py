@@ -7,7 +7,7 @@ from keyboards import keyboard, genres, actions
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from obrabotka_db import recomend
+from obrabotka_db import recomend, recomendRM
 import validator
 
 with open('token') as token:
