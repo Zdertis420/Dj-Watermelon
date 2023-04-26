@@ -31,8 +31,8 @@ class Ans(StatesGroup):
 li = dict()
 
 
-@dispatcer.message_handler(commands=['recommend'])
-async def recommend(mess: types.Message):
+@dispatcer.message_handler(commands=['recomend'])
+async def recomendMusic(mess: types.Message):
     await dj.send_message(text=recomendRM(), chat_id=mess.from_user.id)
 
 
@@ -45,6 +45,12 @@ async def questions(mess: types.Message):
 async def help(mess: types.Message):
     await mess.answer(text='Йоу! Кароче, я тут местный DJ, ну там на вертушках и туц-туц-туц, ну понял.'
                            'Могу подсказать реально годный музон. Йоу!')
+
+    await mess.answer(text='Список комманд\n\n'
+                           '/help - вызвать это меню\n'
+                           '/start - начать работу бота с самого начала\n'
+                           '/recomend - рекомендует 5 случайных песен\n'
+                           '/questions - проведёт небольшой опрос, для лучшей рекомендации музыки')
 
 @dispatcer.message_handler(commands=['more'])
 async def more(mess: types.Message):
