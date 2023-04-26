@@ -5,11 +5,11 @@ import validator
 from time import sleep
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import CallbackQuery, KeyboardButton
-from keyboards import keyboard, genres
+from keyboards import keyboard, genres, actions
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from obrabotka_db import recomend
+from obrabotka_db import recomend, recomendMore
 
 with open('token') as token:
     TOKEN = token.read()
@@ -34,12 +34,16 @@ li = dict()
 
 @dispatcer.message_handler(commands=['more'])
 async def More(mess: types.Message):
-    await dj.send_message(text=recomend(li, str(mess.from_user.id)), chat_id=mess.from_user.id)
+    await dj.send_message(text="Также можешь послушать это:\n\n" + recomend(li, str(mess.from_user.id)),
+                          chat_id=mess.from_user.id)
+    sleep(1)
+    await dj.send_message(text='Что дальше?', reply_markup=actions, chat_id=mess.from_user.id)
+
 
 @dispatcer.message_handler(commands=['again'])
-async def Again(mess: types.Message, state: FSMContext):
-    state.reset()
+async def Again(mess: types.Message):
     await askMood(mess)
+
 
 @dispatcer.message_handler(commands=['start'])
 async def start(mess: types.Message):
@@ -47,19 +51,23 @@ async def start(mess: types.Message):
                         reply_markup=keyboard)
     sleep(0.5)
     await mess.answer(text='Приветсвую!\n'
-                           'Хочешь крутой музон? тогда ответь на парочку моих вопросов')
+                           'Хочешь крутой музон? Тогда ответь на парочку моих вопросов')
 
     # os.system(r'nul>static/ans.txt')
-    sleep(0.5)
+    sleep(0.3)
 
     await askMood(mess)
 
 
 @dispatcer.message_handler()
 async def askMood(mess: types.Message):
+
     li[str(mess.from_user.id)] = []
     sleep(0.5)
-    await mess.answer(text='Итак, вопрос номер один: как настроение? Веселое, грустное, или может ты словил дзен?')
+
+    await dj.send_message(text='Итак, вопрос номер один: как настроение? Веселое, грустное, или может ты словил дзен?',
+                          chat_id=mess.from_user.id)
+    print("gvklhiftyjfgfvyfytif")
     await Ans.mood.set()
 
 
@@ -131,10 +139,25 @@ async def callbackGenre(call: CallbackQuery, state=FSMContext):
 
     print(li)
 
-    await dj.send_message(text=recomend(li, str(call.from_user.id)), chat_id=call.from_user.id)
+    await dj.send_message(text="Тогда тебе стоит послушать это:\n\n" + recomend(li, str(call.from_user.id)),
+                          chat_id=call.from_user.id)
     await state.finish()
+    sleep(1.0)
     keyboard.add(KeyboardButton('more'))
+    await dj.send_message(text='Что дальше?', reply_markup=actions, chat_id=call.from_user.id)
+    await WhatIsNext(call)
 
+
+@dispatcer.callback_query_handler(Text(startswith="btn_"))
+async def WhatIsNext(call: CallbackQuery):
+    await call.answer('Хорошо')
+    action = call.data.split("_")[1]
+
+    match action:
+        case "more":
+            await More(call)
+        case "again":
+            await Again(call)
 
 
 # @dispatcer.message_handler()
