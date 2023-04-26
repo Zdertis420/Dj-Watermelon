@@ -77,6 +77,11 @@ async def getMood(mess: types.Message, state: FSMContext):
     print(mood)
 
     li[str(mess.from_user.id)].append(mood)
+
+    file1 = open("answersM.txt", 'a', encoding='utf-16')
+    file1.write(mess.text + "\n")
+    file1.close()
+
     await mess.answer(text='Второй вопрос: что делаешь?')
 
     await Ans.next()
@@ -92,6 +97,10 @@ async def getOccupation(mess: types.Message, state=FSMContext):
     print(occupation)
 
     li[str(mess.from_user.id)].append(occupation)
+
+    file2 = open("answersO.txt", 'a', encoding='utf-16')
+    file2.write(mess.text + "\n")
+    file2.close()
 
     await mess.answer(text='И последний, какой жанр предпочитаешь?',
                       reply_markup=genres)
