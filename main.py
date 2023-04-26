@@ -31,8 +31,23 @@ class Ans(StatesGroup):
 li = dict()
 
 
+@dispatcer.message_handler(commands=['recommend'])
+async def recommend(mess: types.Message):
+    await dj.send_message(text=recomendRM(), chat_id=mess.from_user.id)
+
+
+@dispatcer.message_handler(commands=['questions'])
+async def questions(mess: types.Message):
+    await askMood(mess)
+
+
+@dispatcer.message_handler(commands=['help'])
+async def help(mess: types.Message):
+    await mess.answer(text='Йоу! Кароче, я тут местный DJ, ну там на вертушках и туц-туц-туц, ну понял.'
+                           'Могу подсказать реально годный музон. Йоу!')
+
 @dispatcer.message_handler(commands=['more'])
-async def More(mess: types.Message):
+async def more(mess: types.Message):
     await dj.send_message(text="Также можешь послушать это:\n\n" + recomend(li, str(mess.from_user.id)),
                           chat_id=mess.from_user.id)
     sleep(1)
@@ -40,7 +55,7 @@ async def More(mess: types.Message):
 
 
 @dispatcer.message_handler(commands=['again'])
-async def Again(mess: types.Message):
+async def again(mess: types.Message):
     await askMood(mess)
 
 
@@ -49,8 +64,8 @@ async def start(mess: types.Message):
     await dj.send_video(mess.chat.id, open('static/img/DJ_Арбуз.mp4', 'rb'),
                         reply_markup=keyboard)
     sleep(0.5)
-    await mess.answer(text='Приветсвую!\n'
-                           'Хочешь крутой музон? Тогда ответь на парочку моих вопросов')
+    await mess.answer(text='Здарова, йоу!\n'
+                           'Хочешь крутой музон? Тогда ответь на парочку моих вопросов. йоу')
 
     sleep(0.3)
 
@@ -62,7 +77,7 @@ async def askMood(mess: types.Message):
     li[str(mess.from_user.id)] = []
     sleep(0.5)
 
-    await dj.send_message(text='Итак, вопрос номер один: как настроение? Веселое, грустное, или может ты словил дзен?',
+    await dj.send_message(text='Итак, вопрос номер один: как настроение? Веселое, грустное, или может ты словил дзен? Йоу',
                           chat_id=mess.from_user.id)
     print("gvklhiftyjfgfvyfytif")
     await Ans.mood.set()
@@ -82,7 +97,7 @@ async def getMood(mess: types.Message, state: FSMContext):
     file1.write(mess.text + "\n")
     file1.close()
 
-    await mess.answer(text='Второй вопрос: что делаешь?')
+    await mess.answer(text='Второй вопрос: что делаешь? Йоу')
 
     await Ans.next()
 
@@ -102,7 +117,7 @@ async def getOccupation(mess: types.Message, state=FSMContext):
     file2.write(mess.text + "\n")
     file2.close()
 
-    await mess.answer(text='И последний, какой жанр предпочитаешь?',
+    await mess.answer(text='И последний, какой жанр предпочитаешь? Йоу',
                       reply_markup=genres)
     await Ans.next()
 
@@ -134,25 +149,25 @@ async def callbackGenre(call: CallbackQuery, state=FSMContext):
 
     print(li)
 
-    await dj.send_message(text="Тогда тебе стоит послушать это:\n\n" + recomend(li, str(call.from_user.id)),
+    await dj.send_message(text=f"Тогда тебе стоит послушать это:\n\n{recomend(li, str(call.from_user.id))}\nНу как тебе? Йоу",
                           chat_id=call.from_user.id)
     await state.finish()
     sleep(1.0)
     keyboard.add(KeyboardButton('more'))
     await dj.send_message(text='Что дальше?', reply_markup=actions, chat_id=call.from_user.id)
-    await WhatIsNext(call)
+    await whatIsNext(call)
 
 
 @dispatcer.callback_query_handler(Text(startswith="btn_"))
-async def WhatIsNext(call: CallbackQuery):
+async def whatIsNext(call: CallbackQuery):
     await call.answer('Хорошо')
     action = call.data.split("_")[1]
 
     match action:
         case "more":
-            await More(call)
+            await more(call)
         case "again":
-            await Again(call)
+            await again(call)
 
 
 if __name__ == '__main__':
