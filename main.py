@@ -1,15 +1,14 @@
 import logging
-import os
-from aiogram.dispatcher.filters import Text
-import validator
 from time import sleep
+from aiogram.dispatcher.filters import Text
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import CallbackQuery, KeyboardButton
 from keyboards import keyboard, genres, actions
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from obrabotka_db import recomend, recomendMore
+from obrabotka_db import recomend
+import validator
 
 with open('token') as token:
     TOKEN = token.read()
@@ -53,7 +52,6 @@ async def start(mess: types.Message):
     await mess.answer(text='Приветсвую!\n'
                            'Хочешь крутой музон? Тогда ответь на парочку моих вопросов')
 
-    # os.system(r'nul>static/ans.txt')
     sleep(0.3)
 
     await askMood(mess)
@@ -61,7 +59,6 @@ async def start(mess: types.Message):
 
 @dispatcer.message_handler()
 async def askMood(mess: types.Message):
-
     li[str(mess.from_user.id)] = []
     sleep(0.5)
 
@@ -85,31 +82,20 @@ async def getMood(mess: types.Message, state: FSMContext):
     await Ans.next()
 
 
-# @dispatcer.message_handler(state=Ans.occupation)
-# async def askOccupation(mess: types.Message):
-#     await mess.answer(text='Второй вопрос: чо делвешь?')
-
-
 @dispatcer.message_handler(state=Ans.occupation)
 async def getOccupation(mess: types.Message, state=FSMContext):
-    # answers = await state.get_data()
-    # mood = answers.get("mood")
     occupation = validator.validateOccupation(mess.text)
     await state.update_data(
         {'Занятие:': occupation}
     )
+
     print(occupation)
+
     li[str(mess.from_user.id)].append(occupation)
-    print(li)
+
     await mess.answer(text='И последний, какой жанр предпочитаешь?',
                       reply_markup=genres)
     await Ans.next()
-
-
-# @dispatcer.message_handler(state=Ans.genre)
-# async def askGenre(mess: types.Message):
-#     await mess.answer(text='И последний, какой жанр предпочетаешь?',
-#                       reply_markup=genres)
 
 
 @dispatcer.callback_query_handler(Text(startswith="genre_"), state=Ans.genre)
@@ -158,13 +144,6 @@ async def WhatIsNext(call: CallbackQuery):
             await More(call)
         case "again":
             await Again(call)
-
-
-# @dispatcer.message_handler()
-# async def getMoodOrOccupation(mess: types.Message):
-#     mood = validator.validateMood(mess)
-#     occupation = validator.validateOccupation(mess)
-#     return (mood, occupation)
 
 
 if __name__ == '__main__':
