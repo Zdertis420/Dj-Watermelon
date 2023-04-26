@@ -11,7 +11,7 @@ def recomend(li, Uid):
     o = li[Uid][1]
     g = li[Uid][2]
 
-    DB = "watermelow.db"
+    DB = "music/DJ-Арбуз музыка.db"
     connection = sqlite3.connect(DB)
     cur = connection.cursor()
 
