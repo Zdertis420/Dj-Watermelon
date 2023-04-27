@@ -10,6 +10,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from obrabotka_db import recomend, recomendRM
 import validator
 
+
 with open('token') as token:
     TOKEN = token.read()
 
@@ -69,12 +70,12 @@ async def again(mess: types.Message):
 async def start(mess: types.Message):
     await dj.send_video(mess.chat.id, open('static/img/DJ_Арбуз.mp4', 'rb'),
                         reply_markup=keyboard)
+    
     sleep(0.5)
     await mess.answer(text='Здарова, йоу!\n'
                            'Хочешь крутой музон? Тогда ответь на парочку моих вопросов. йоу')
 
     sleep(0.3)
-
     await askMood(mess)
 
 
@@ -130,6 +131,7 @@ async def getOccupation(mess: types.Message, state=FSMContext):
 
 @dispatcer.callback_query_handler(Text(startswith="genre_"), state=Ans.genre)
 async def callbackGenre(call: CallbackQuery, state=FSMContext):
+   
     await call.answer('Хорошо')
     action = call.data.split("_")[1]
 
@@ -158,8 +160,9 @@ async def callbackGenre(call: CallbackQuery, state=FSMContext):
     await dj.send_message(text=f"Тогда тебе стоит послушать это:\n\n{recomend(li, str(call.from_user.id))}\nНу как тебе? Йоу",
                           chat_id=call.from_user.id)
     await state.finish()
+    
     sleep(1.0)
-    keyboard.add(KeyboardButton('more'))
+    
     await dj.send_message(text='Что дальше?', reply_markup=actions, chat_id=call.from_user.id)
     await whatIsNext(call)
 
